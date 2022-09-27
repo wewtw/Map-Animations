@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Add a default marker</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .map-overlay {
+      position: absolute;
+      left: 8;
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id='map'></div>
+  <div class="map-overlay top">
+    <button style="font-size:2em;" onclick="move()">
+      The DC National Mall jog loop.
+    </button>
+  </div>
+  <script>
+    mapboxgl.accessToken = 'PUTURMAPBOXTOKENHERE';
+    const map = new mapboxgl.Map({
+      container: 'map', // container ID
+      style: 'mapbox://styles/mapbox/streets-v11', // style URL
+      center: [-77.019777, 38.88892], // starting position [lng, lat]
+      zoom: 13, // starting zoom
+      projection: 'globe' // display the map as a 3D globe
+    });
+    map.on('style.load', () => {
+      map.setFog({}); // Set the default atmosphere style
+    });
+
+    var marker = new mapboxgl.Marker(
+      {
+        color: "green",
+        draggable: false
+      })
+      .setLngLat([-77.015544, 38.888962])
+      .addTo(map);
+    const jogCircle = [
+      [-77.019777, 38.88892],
+      [-77.028612, 38.88882],
+      [-77.034704, 38.888444],
+      [-77.041065, 38.888887],
+      [-77.048782, 38.888812],
+      [-77.04868, 38.889797],
+      [-77.040521, 38.890081],
+      [-77.033174, 38.889997],
+      [-77.025978, 38.890273],
+      [-77.015521, 38.890515],
+      [-77.019777, 38.88892]
+    ];
+
+    var counter = 0;
+    function move() {
+      setTimeout(() => {
+        if (counter >= jogCircle.length) return;
+        marker.setLngLat(jogCircle[counter]);
+        counter++;
+        move();
+      }, 2000);
+    }
+
+    const geojson = {
+    'type': 'FeatureCollection',
+    'features': [
+        {
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+                'coordinates': [
+                [-77.019777, 38.88892],
+                [-77.028612, 38.88882],
+                [-77.034704, 38.888444],
+                [-77.041065, 38.888887],
+                [-77.048782, 38.888812],
+                [-77.04868, 38.889797],
+                [-77.040521, 38.890081],
+                [-77.033174, 38.889997],
+                [-77.025978, 38.890273],
+                [-77.015521, 38.890515],
+                [-77.019777, 38.88892],
+                [-77.028612, 38.88882],
+                [-77.034704, 38.888444],
+                [-77.041065, 38.888887],
+                ],
+                'type': 'LineString'
+            }
+        }
+    ]
+};
+
+
+
+
+map.on('load', () => {
+    // 'line-gradient' can only be used with GeoJSON sources
+    // and the source must have the 'lineMetrics' option set to true
+    map.addSource('line', {
+        type: 'geojson',
+        lineMetrics: true,
+        data: geojson
+    });
+
+    // the layer must be of type 'line'
+    map.addLayer({
+        type: 'line',
+        source: 'line',
+        id: 'line',
+        paint: {
+            'line-color': 'red',
+            'line-width': 14,
+            // 'line-gradient' must be specified using an expression
+            // with the special 'line-progress' property
+            'line-gradient': [
+                'interpolate',
+                ['linear'],
+                ['line-progress'],
+                0.1,
+                'gray',
+                
+              
+              
+            ]
+        },
+        layout: {
+            'line-cap': 'round',
+            'line-join': 'round'
+        }
+    });
+});
+  </script>
+
+</body>
+
+</html>
+</script>
+</body>
+
+</html>
